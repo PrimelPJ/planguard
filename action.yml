@@ -1,0 +1,43 @@
+name: planguard
+description: Find security problems in a Terraform plan before you apply it.
+branding:
+  icon: shield
+  color: green
+
+inputs:
+  plan:
+    description: Path to the plan JSON (terraform show -json tfplan > plan.json)
+    required: true
+  format:
+    description: text, json, sarif or markdown
+    default: text
+  output:
+    description: File to write the report to (leave empty to print it)
+    default: ""
+  fail-on:
+    description: Fail the step if a problem this bad or worse is found (low, medium, high, critical, none)
+    default: high
+  config:
+    description: Path to a planguard.toml with waivers
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+    - shell: bash
+      run: pip install --quiet "${{ github.action_path }}"
+    - shell: bash
+      env:
+        PLAN: ${{ inputs.plan }}
+        FORMAT: ${{ inputs.format }}
+        OUTPUT: ${{ inputs.output }}
+        FAIL_ON: ${{ inputs.fail-on }}
+        CONFIG: ${{ inputs.config }}
+      run: |
+        args=(scan "$PLAN" --format "$FORMAT" --fail-on "$FAIL_ON")
+        [ -n "$OUTPUT" ] && args+=(--output "$OUTPUT")
+        [ -n "$CONFIG" ] && args+=(--config "$CONFIG")
+        planguard "${args[@]}"
