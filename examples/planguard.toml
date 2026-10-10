@@ -1,0 +1,17 @@
+# planguard config. Put this file next to your plan as planguard.toml,
+# or pass it with --config.
+
+# Rules you never want to run.
+skip_rules = []
+
+# A waiver says: "we know about this problem and accept it for now."
+# Every waiver needs a rule, a resource, a reason and an end date.
+# When the date passes, the waiver stops working and the problem shows up again.
+# Wildcards work in rule and resource, like "PG00*" or "module.dev.*".
+
+[[waiver]]
+rule = "PG003"
+resource = "aws_s3_bucket.site"
+reason = "Site files are rebuilt from git on every deploy, so old versions are not needed."
+owner = "primel"
+expires = 2027-06-30

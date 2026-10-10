@@ -1,0 +1,397 @@
+{
+  "format_version": "1.2",
+  "terraform_version": "1.9.5",
+  "planned_values": {
+    "root_module": {
+      "resources": [
+        {
+          "address": "aws_s3_bucket.site",
+          "mode": "managed",
+          "type": "aws_s3_bucket",
+          "name": "site",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "bucket": "acme-site",
+            "force_destroy": false,
+            "tags": null
+          }
+        },
+        {
+          "address": "aws_s3_bucket.logs",
+          "mode": "managed",
+          "type": "aws_s3_bucket",
+          "name": "logs",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "bucket": "acme-logs",
+            "force_destroy": false,
+            "tags": null
+          }
+        },
+        {
+          "address": "aws_s3_bucket_versioning.logs",
+          "mode": "managed",
+          "type": "aws_s3_bucket_versioning",
+          "name": "logs",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "versioning_configuration": [
+              {
+                "status": "Suspended",
+                "mfa_delete": null
+              }
+            ]
+          }
+        },
+        {
+          "address": "aws_s3_bucket_public_access_block.logs",
+          "mode": "managed",
+          "type": "aws_s3_bucket_public_access_block",
+          "name": "logs",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "block_public_acls": true,
+            "block_public_policy": false,
+            "ignore_public_acls": true,
+            "restrict_public_buckets": true
+          }
+        },
+        {
+          "address": "aws_security_group.web",
+          "mode": "managed",
+          "type": "aws_security_group",
+          "name": "web",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "name": "web",
+            "description": "web servers",
+            "ingress": [
+              {
+                "description": "https",
+                "protocol": "tcp",
+                "from_port": 443,
+                "to_port": 443,
+                "cidr_blocks": [
+                  "0.0.0.0/0"
+                ],
+                "ipv6_cidr_blocks": [],
+                "self": false
+              },
+              {
+                "description": "ssh",
+                "protocol": "tcp",
+                "from_port": 22,
+                "to_port": 22,
+                "cidr_blocks": [
+                  "0.0.0.0/0"
+                ],
+                "ipv6_cidr_blocks": [],
+                "self": false
+              }
+            ],
+            "egress": []
+          }
+        },
+        {
+          "address": "aws_db_instance.main",
+          "mode": "managed",
+          "type": "aws_db_instance",
+          "name": "main",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "identifier": "acme-main",
+            "engine": "postgres",
+            "instance_class": "db.t4g.micro",
+            "publicly_accessible": true,
+            "storage_encrypted": false,
+            "backup_retention_period": 0
+          }
+        },
+        {
+          "address": "aws_instance.app",
+          "mode": "managed",
+          "type": "aws_instance",
+          "name": "app",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "ami": "ami-0abcdef1234567890",
+            "instance_type": "t3.micro",
+            "metadata_options": [
+              {
+                "http_endpoint": "enabled",
+                "http_tokens": "optional",
+                "http_put_response_hop_limit": 1
+              }
+            ],
+            "root_block_device": [
+              {
+                "encrypted": false,
+                "volume_size": 20,
+                "volume_type": "gp3"
+              }
+            ]
+          }
+        },
+        {
+          "address": "aws_iam_policy.ci",
+          "mode": "managed",
+          "type": "aws_iam_policy",
+          "name": "ci",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "name": "ci-deploy",
+            "path": "/",
+            "policy": "{\"Version\": \"2012-10-17\", \"Statement\": [{\"Effect\": \"Allow\", \"Action\": \"*\", \"Resource\": \"*\"}]}"
+          }
+        },
+        {
+          "address": "aws_cloudtrail.main",
+          "mode": "managed",
+          "type": "aws_cloudtrail",
+          "name": "main",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "name": "main",
+            "s3_bucket_name": "acme-logs",
+            "is_multi_region_trail": false,
+            "enable_log_file_validation": false,
+            "include_global_service_events": true
+          }
+        },
+        {
+          "address": "azurerm_network_security_group.jump",
+          "mode": "managed",
+          "type": "azurerm_network_security_group",
+          "name": "jump",
+          "provider_name": "registry.terraform.io/hashicorp/azurerm",
+          "schema_version": 0,
+          "values": {
+            "name": "jump-nsg",
+            "location": "canadacentral",
+            "resource_group_name": "acme",
+            "security_rule": [
+              {
+                "name": "allow-rdp",
+                "priority": 100,
+                "direction": "Inbound",
+                "access": "Allow",
+                "protocol": "Tcp",
+                "source_port_range": "*",
+                "source_port_ranges": [],
+                "destination_port_range": "3389",
+                "destination_port_ranges": [],
+                "source_address_prefix": "*",
+                "source_address_prefixes": [],
+                "destination_address_prefix": "*",
+                "destination_address_prefixes": [],
+                "description": ""
+              }
+            ]
+          }
+        },
+        {
+          "address": "azurerm_linux_virtual_machine.jump",
+          "mode": "managed",
+          "type": "azurerm_linux_virtual_machine",
+          "name": "jump",
+          "provider_name": "registry.terraform.io/hashicorp/azurerm",
+          "schema_version": 0,
+          "values": {
+            "name": "jump",
+            "size": "Standard_B1s",
+            "admin_username": "azureuser",
+            "disable_password_authentication": false
+          }
+        },
+        {
+          "address": "azurerm_key_vault.secrets",
+          "mode": "managed",
+          "type": "azurerm_key_vault",
+          "name": "secrets",
+          "provider_name": "registry.terraform.io/hashicorp/azurerm",
+          "schema_version": 0,
+          "values": {
+            "name": "acme-secrets",
+            "sku_name": "standard",
+            "purge_protection_enabled": false,
+            "soft_delete_retention_days": 90
+          }
+        },
+        {
+          "address": "azurerm_mssql_server.db",
+          "mode": "managed",
+          "type": "azurerm_mssql_server",
+          "name": "db",
+          "provider_name": "registry.terraform.io/hashicorp/azurerm",
+          "schema_version": 0,
+          "values": {
+            "name": "acme-sql",
+            "version": "12.0",
+            "public_network_access_enabled": true,
+            "minimum_tls_version": "1.2"
+          }
+        },
+        {
+          "address": "aws_s3_bucket_acl.site",
+          "mode": "managed",
+          "type": "aws_s3_bucket_acl",
+          "name": "site",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "acl": "public-read"
+          }
+        },
+        {
+          "address": "aws_vpc_security_group_ingress_rule.debug",
+          "mode": "managed",
+          "type": "aws_vpc_security_group_ingress_rule",
+          "name": "debug",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "ip_protocol": "-1",
+            "cidr_ipv4": "0.0.0.0/0",
+            "description": "temp debug access"
+          }
+        }
+      ],
+      "child_modules": [
+        {
+          "address": "module.storage",
+          "resources": [
+            {
+              "address": "module.storage.azurerm_storage_account.data",
+              "mode": "managed",
+              "type": "azurerm_storage_account",
+              "name": "data",
+              "provider_name": "registry.terraform.io/hashicorp/azurerm",
+              "schema_version": 0,
+              "values": {
+                "name": "acmedata",
+                "account_tier": "Standard",
+                "account_replication_type": "LRS",
+                "https_traffic_only_enabled": false,
+                "min_tls_version": "TLS1_0",
+                "allow_nested_items_to_be_public": true
+              }
+            },
+            {
+              "address": "module.storage.azurerm_storage_container.uploads",
+              "mode": "managed",
+              "type": "azurerm_storage_container",
+              "name": "uploads",
+              "provider_name": "registry.terraform.io/hashicorp/azurerm",
+              "schema_version": 0,
+              "values": {
+                "name": "uploads",
+                "container_access_type": "container"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "configuration": {
+    "root_module": {
+      "resources": [
+        {
+          "address": "aws_s3_bucket.site",
+          "mode": "managed",
+          "type": "aws_s3_bucket",
+          "name": "site",
+          "expressions": {}
+        },
+        {
+          "address": "aws_s3_bucket.logs",
+          "mode": "managed",
+          "type": "aws_s3_bucket",
+          "name": "logs",
+          "expressions": {}
+        },
+        {
+          "address": "aws_s3_bucket_versioning.logs",
+          "mode": "managed",
+          "type": "aws_s3_bucket_versioning",
+          "name": "logs",
+          "expressions": {
+            "bucket": {
+              "references": [
+                "aws_s3_bucket.logs.id",
+                "aws_s3_bucket.logs"
+              ]
+            }
+          }
+        },
+        {
+          "address": "aws_s3_bucket_public_access_block.logs",
+          "mode": "managed",
+          "type": "aws_s3_bucket_public_access_block",
+          "name": "logs",
+          "expressions": {
+            "bucket": {
+              "references": [
+                "aws_s3_bucket.logs.id",
+                "aws_s3_bucket.logs"
+              ]
+            }
+          }
+        },
+        {
+          "address": "aws_s3_bucket_acl.site",
+          "mode": "managed",
+          "type": "aws_s3_bucket_acl",
+          "name": "site",
+          "expressions": {
+            "bucket": {
+              "references": [
+                "aws_s3_bucket.site.id",
+                "aws_s3_bucket.site"
+              ]
+            }
+          }
+        }
+      ],
+      "module_calls": {
+        "storage": {
+          "source": "./modules/storage",
+          "module": {
+            "resources": [
+              {
+                "address": "azurerm_storage_account.data",
+                "mode": "managed",
+                "type": "azurerm_storage_account",
+                "name": "data",
+                "expressions": {}
+              },
+              {
+                "address": "azurerm_storage_container.uploads",
+                "mode": "managed",
+                "type": "azurerm_storage_container",
+                "name": "uploads",
+                "expressions": {
+                  "storage_account_id": {
+                    "references": [
+                      "azurerm_storage_account.data.id",
+                      "azurerm_storage_account.data"
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}
