@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "planguard"
+version = "0.1.0"
+description = "Find security problems in a Terraform plan before you apply it."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Primel Jayawardana" }]
+keywords = ["terraform", "security", "aws", "azure", "compliance", "nist", "sarif"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Topic :: Security",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/PrimelPJ/planguard"
+
+[project.scripts]
+planguard = "planguard.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
