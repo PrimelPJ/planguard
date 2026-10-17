@@ -304,3 +304,18 @@ def ecr_scan_on_push(plan: Plan) -> Iterator[Hit]:
             continue
         if repo.block("image_scanning_configuration").get("scan_on_push") is not True:
             yield repo, "scan_on_push is not enabled"
+
+
+@rule(
+    "PG015",
+    "Lambda function URL allows unauthenticated access",
+    "high",
+    "aws",
+    ["AC-3", "SC-7"],
+    risk="The function can be invoked by anyone on the internet without authenticating.",
+    fix='Set authorization_type = "AWS_IAM" on the aws_lambda_function_url resource.',
+)
+def lambda_url_no_auth(plan: Plan) -> Iterator[Hit]:
+    for url in plan.of_type("aws_lambda_function_url"):
+        if url.get("authorization_type") == "NONE":
+            yield url, 'authorization_type is "NONE"'
