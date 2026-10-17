@@ -272,3 +272,18 @@ def imdsv2(plan: Plan) -> Iterator[Hit]:
         tokens = res.block("metadata_options").get("http_tokens")
         if tokens != "required":
             yield res, f"http_tokens is '{tokens or 'not set'}', so the old IMDSv1 still works"
+
+
+@rule(
+    "PG013",
+    "KMS key rotation is not enabled",
+    "medium",
+    "aws",
+    ["SC-12"],
+    risk="A long-lived key increases exposure if it is ever compromised; rotating it limits the blast radius.",
+    fix="Set enable_key_rotation = true on the aws_kms_key resource.",
+)
+def kms_key_rotation(plan: Plan) -> Iterator[Hit]:
+    for key in plan.of_type("aws_kms_key"):
+        if key.known("enable_key_rotation") and key.get("enable_key_rotation") is not True:
+            yield key, "enable_key_rotation is not true"
