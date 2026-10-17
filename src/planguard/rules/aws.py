@@ -287,3 +287,20 @@ def kms_key_rotation(plan: Plan) -> Iterator[Hit]:
     for key in plan.of_type("aws_kms_key"):
         if key.known("enable_key_rotation") and key.get("enable_key_rotation") is not True:
             yield key, "enable_key_rotation is not true"
+
+
+@rule(
+    "PG014",
+    "ECR repository does not scan images on push",
+    "medium",
+    "aws",
+    ["SI-3", "SI-7"],
+    risk="Vulnerable packages in container images go undetected until a container is already running.",
+    fix="Set scan_on_push = true inside the image_scanning_configuration block.",
+)
+def ecr_scan_on_push(plan: Plan) -> Iterator[Hit]:
+    for repo in plan.of_type("aws_ecr_repository"):
+        if not repo.known("image_scanning_configuration"):
+            continue
+        if repo.block("image_scanning_configuration").get("scan_on_push") is not True:
+            yield repo, "scan_on_push is not enabled"
