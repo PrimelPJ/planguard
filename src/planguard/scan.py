@@ -12,6 +12,9 @@ from .plan import Plan
 from .rules import RULES, SEVERITIES, Rule
 
 
+DEFAULT_MIN_SEVERITY = "low"
+
+
 class ConfigError(Exception):
     """The config file has a mistake in it."""
 
@@ -108,7 +111,7 @@ def load_config(path: str | Path) -> Config:
 def scan(
     plan: Plan,
     config: Config | None = None,
-    min_severity: str = "low",
+    min_severity: str = DEFAULT_MIN_SEVERITY,
     clouds: set[str] | None = None,
     today: date | None = None,
 ) -> Result:
