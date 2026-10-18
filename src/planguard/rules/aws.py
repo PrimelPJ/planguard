@@ -319,3 +319,22 @@ def lambda_url_no_auth(plan: Plan) -> Iterator[Hit]:
     for url in plan.of_type("aws_lambda_function_url"):
         if url.get("authorization_type") == "NONE":
             yield url, 'authorization_type is "NONE"'
+
+
+@rule(
+    "PG016",
+    "S3 bucket does not have server access logging enabled",
+    "low",
+    "aws",
+    ["AU-2", "AU-12"],
+    risk="Without access logs, there is no record of who read or modified the bucket contents.",
+    fix="Add an aws_s3_bucket_logging block pointing to a target bucket for access logs.",
+)
+def s3_access_logging(plan: Plan) -> Iterator[Hit]:
+    logging_resources = plan.of_type("aws_s3_bucket_logging")
+    for bucket in plan.of_type("aws_s3_bucket"):
+        if bucket.block("logging").get("target_bucket"):
+            continue  # inline logging block present
+        mine = [lg for lg in logging_resources if lg.points_to("bucket", bucket)]
+        if not mine:
+            yield bucket, "no server access logging is configured for this bucket"
