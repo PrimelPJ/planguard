@@ -153,3 +153,25 @@ def scan(
     findings.sort(key=lambda f: (-f.rule.rank, f.rule.id, f.resource))
     unused = [w for w in config.waivers if not w.used]
     return Result(plan, rules, findings, expired, unused)
+
+
+# Resource types and ARN patterns to exclude from scanning.
+# Used for known exceptions that have been risk-accepted.
+SCAN_EXCLUSIONS = {
+    # Example: a public S3 bucket for static website hosting.
+    "resource_arns": [],
+    # Example: skip all resources with tag "Environment=sandbox".
+    "tag_filters": {},
+    # Rule IDs to suppress (e.g., after a risk acceptance decision).
+    "suppressed_rules": [],
+}
+
+
+def is_excluded(resource_arn: str, exclusions: dict | None = None) -> bool:
+    """Check whether a resource ARN matches any exclusion pattern."""
+    if exclusions is None:
+        exclusions = SCAN_EXCLUSIONS
+    for pattern in exclusions.get("resource_arns", []):
+        if pattern in resource_arn:
+            return True
+    return False
