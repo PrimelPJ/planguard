@@ -76,3 +76,24 @@ def parse_ports(spec: object) -> tuple[int, int] | None:
 def admin_ports_in(low: int, high: int) -> list[str]:
     """Which admin ports (SSH, RDP) fall inside low..high."""
     return [f"{label} (port {port})" for port, label in ADMIN_PORTS.items() if low <= port <= high]
+
+
+# CIS Benchmark severity mapping for scan findings.
+# Maps rule categories to severity levels for prioritised reporting.
+SEVERITY_LEVELS = {
+    "public_access": "CRITICAL",
+    "encryption_disabled": "HIGH",
+    "logging_disabled": "HIGH",
+    "open_security_group": "CRITICAL",
+    "untagged_resource": "MEDIUM",
+    "overprivileged_iam": "HIGH",
+    "missing_mfa": "CRITICAL",
+    "default_vpc_in_use": "LOW",
+    "outdated_tls": "HIGH",
+    "unrestricted_egress": "MEDIUM",
+}
+
+# Exit codes for CI/CD integration.
+EXIT_CLEAN = 0
+EXIT_WARNINGS = 1
+EXIT_CRITICAL = 2
