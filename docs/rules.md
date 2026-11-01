@@ -16,6 +16,10 @@ This file is made by `scripts/rules_doc.py`. Do not edit it by hand.
 | [PG010](#pg010) | aws | medium | CloudTrail is missing key settings |
 | [PG011](#pg011) | aws | medium | Database backups are turned off |
 | [PG012](#pg012) | aws | medium | Server does not require IMDSv2 |
+| [PG013](#pg013) | aws | medium | KMS key rotation is not enabled |
+| [PG014](#pg014) | aws | medium | ECR repository does not scan images on push |
+| [PG015](#pg015) | aws | high | Lambda function URL allows unauthenticated access |
+| [PG016](#pg016) | aws | low | S3 bucket does not have server access logging enabled |
 | [PG101](#pg101) | azure | high | Storage account allows plain HTTP |
 | [PG102](#pg102) | azure | medium | Storage account allows old TLS versions |
 | [PG103](#pg103) | azure | high | Storage allows public access to files |
@@ -119,6 +123,38 @@ This file is made by `scripts/rules_doc.py`. Do not edit it by hand.
 - **Why it matters:** A bug in an app on the server can be used to steal the server's AWS keys (this is how the 2019 Capital One breach worked).
 - **How to fix:** Add a metadata_options block with http_tokens = "required".
 - **NIST SP 800-53:** AC-3 (Access Enforcement), CM-6 (Configuration Settings)
+
+## PG013
+
+**KMS key rotation is not enabled** (aws, medium)
+
+- **Why it matters:** A long-lived key increases exposure if it is ever compromised; rotating it limits the blast radius.
+- **How to fix:** Set enable_key_rotation = true on the aws_kms_key resource.
+- **NIST SP 800-53:** SC-12 (Cryptographic Key Management)
+
+## PG014
+
+**ECR repository does not scan images on push** (aws, medium)
+
+- **Why it matters:** Vulnerable packages in container images go undetected until a container is already running.
+- **How to fix:** Set scan_on_push = true inside the image_scanning_configuration block.
+- **NIST SP 800-53:** SI-3 (), SI-7 ()
+
+## PG015
+
+**Lambda function URL allows unauthenticated access** (aws, high)
+
+- **Why it matters:** The function can be invoked by anyone on the internet without authenticating.
+- **How to fix:** Set authorization_type = "AWS_IAM" on the aws_lambda_function_url resource.
+- **NIST SP 800-53:** AC-3 (Access Enforcement), SC-7 (Boundary Protection)
+
+## PG016
+
+**S3 bucket does not have server access logging enabled** (aws, low)
+
+- **Why it matters:** Without access logs, there is no record of who read or modified the bucket contents.
+- **How to fix:** Add an aws_s3_bucket_logging block pointing to a target bucket for access logs.
+- **NIST SP 800-53:** AU-2 (Event Logging), AU-12 (Audit Record Generation)
 
 ## PG101
 

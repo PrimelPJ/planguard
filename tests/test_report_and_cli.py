@@ -42,12 +42,12 @@ class ReportTest(unittest.TestCase):
 
     def test_text(self):
         text = to_text(self.result)
-        self.assertIn("Found 21 problems", text)
+        self.assertIn("Found 23 problems", text)
         self.assertIn("1 waived", text)
 
     def test_json(self):
         data = json.loads(to_json(self.result))
-        self.assertEqual(data["summary"]["problems"], 21)
+        self.assertEqual(data["summary"]["problems"], 23)
         self.assertEqual(data["summary"]["critical"], 3)
         self.assertEqual(data["waived"][0]["waiver"]["reason"], "Rebuilt from git")
 

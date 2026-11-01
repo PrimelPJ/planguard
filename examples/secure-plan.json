@@ -269,6 +269,28 @@
             "ignore_public_acls": true,
             "restrict_public_buckets": true
           }
+        },
+        {
+          "address": "aws_s3_bucket_logging.site",
+          "mode": "managed",
+          "type": "aws_s3_bucket_logging",
+          "name": "site",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "target_prefix": "site/"
+          }
+        },
+        {
+          "address": "aws_s3_bucket_logging.logs",
+          "mode": "managed",
+          "type": "aws_s3_bucket_logging",
+          "name": "logs",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "target_prefix": "self/"
+          }
         }
       ],
       "child_modules": [
@@ -378,6 +400,52 @@
                 "aws_s3_bucket.site.id",
                 "aws_s3_bucket.site"
               ]
+            }
+          }
+        },
+        {
+          "address": "aws_s3_bucket_logging.site",
+          "mode": "managed",
+          "type": "aws_s3_bucket_logging",
+          "name": "site",
+          "expressions": {
+            "bucket": {
+              "references": [
+                "aws_s3_bucket.site.id",
+                "aws_s3_bucket.site"
+              ]
+            },
+            "target_bucket": {
+              "references": [
+                "aws_s3_bucket.logs.id",
+                "aws_s3_bucket.logs"
+              ]
+            },
+            "target_prefix": {
+              "constant_value": "site/"
+            }
+          }
+        },
+        {
+          "address": "aws_s3_bucket_logging.logs",
+          "mode": "managed",
+          "type": "aws_s3_bucket_logging",
+          "name": "logs",
+          "expressions": {
+            "bucket": {
+              "references": [
+                "aws_s3_bucket.logs.id",
+                "aws_s3_bucket.logs"
+              ]
+            },
+            "target_bucket": {
+              "references": [
+                "aws_s3_bucket.logs.id",
+                "aws_s3_bucket.logs"
+              ]
+            },
+            "target_prefix": {
+              "constant_value": "self/"
             }
           }
         }
