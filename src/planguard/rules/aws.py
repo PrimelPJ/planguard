@@ -63,7 +63,7 @@ def s3_public_access_block(plan: Plan) -> Iterator[Hit]:
     "aws",
     ["CP-9"],
     risk="If a file is deleted or overwritten (by mistake or by ransomware), it cannot be brought back.",
-    fix="Add aws_s3_bucket_versioning for the bucket with status = \"Enabled\".",
+    fix='Add aws_s3_bucket_versioning for the bucket with status = "Enabled".',
 )
 def s3_versioning(plan: Plan) -> Iterator[Hit]:
     versioning = plan.of_type("aws_s3_bucket_versioning")
@@ -338,3 +338,20 @@ def s3_access_logging(plan: Plan) -> Iterator[Hit]:
         mine = [lg for lg in logging_resources if lg.points_to("bucket", bucket)]
         if not mine:
             yield bucket, "no server access logging is configured for this bucket"
+
+
+@rule(
+    "PG017",
+    "S3 bucket has no lifecycle configuration",
+    "low",
+    "aws",
+    ["CP-9"],
+    risk="Old object versions and incomplete multipart uploads accumulate indefinitely, increasing storage costs and data exposure.",
+    fix="Add an aws_s3_bucket_lifecycle_configuration for the bucket with rules that expire non-current versions and abort incomplete uploads.",
+)
+def s3_lifecycle(plan: Plan) -> Iterator[Hit]:
+    lifecycle_resources = plan.of_type("aws_s3_bucket_lifecycle_configuration")
+    for bucket in plan.of_type("aws_s3_bucket"):
+        mine = [lc for lc in lifecycle_resources if lc.points_to("bucket", bucket)]
+        if not mine:
+            yield bucket, "no lifecycle configuration is attached to this bucket"
