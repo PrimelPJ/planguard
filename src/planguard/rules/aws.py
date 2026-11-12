@@ -355,3 +355,18 @@ def s3_lifecycle(plan: Plan) -> Iterator[Hit]:
         mine = [lc for lc in lifecycle_resources if lc.points_to("bucket", bucket)]
         if not mine:
             yield bucket, "no lifecycle configuration is attached to this bucket"
+
+
+@rule(
+    "PG018",
+    "RDS instance or cluster does not have deletion protection enabled",
+    "high",
+    "aws",
+    ["CP-9"],
+    risk="Without deletion protection, a terraform destroy or accidental apply can permanently delete a production database.",
+    fix="Set deletion_protection = true on the aws_db_instance or aws_rds_cluster resource.",
+)
+def rds_deletion_protection(plan: Plan) -> Iterator[Hit]:
+    for res in plan.of_type("aws_db_instance", "aws_rds_cluster"):
+        if res.get("deletion_protection") is not True:
+            yield res, "deletion_protection is not set to true"
