@@ -372,22 +372,3 @@ def rds_deletion_protection(plan: Plan) -> Iterator[Hit]:
             yield res, "deletion_protection is not set to true"
 
 
-@rule(
-    "PG019",
-    "S3 bucket does not have versioning enabled",
-    "medium",
-    "aws",
-    ["CP-9"],
-    risk="Without versioning, accidental or malicious deletion or overwrite of objects cannot be recovered.",
-    fix="Add an aws_s3_bucket_versioning resource with versioning_configuration { status = \"Enabled\" }.",
-)
-def s3_versioning(plan: Plan) -> Iterator[Hit]:
-    versioning_resources = plan.of_type("aws_s3_bucket_versioning")
-    for bucket in plan.of_type("aws_s3_bucket"):
-        mine = [v for v in versioning_resources if v.points_to("bucket", bucket)]
-        if not mine:
-            yield bucket, "no versioning configuration is attached to this bucket"
-            continue
-        status = (mine[0].get("versioning_configuration") or {}).get("status")
-        if status != "Enabled":
-            yield mine[0], f"versioning status is '{status}', expected 'Enabled'"

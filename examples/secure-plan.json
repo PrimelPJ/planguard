@@ -110,7 +110,8 @@
             "instance_class": "db.t4g.micro",
             "publicly_accessible": false,
             "storage_encrypted": true,
-            "backup_retention_period": 7
+            "backup_retention_period": 7,
+            "deletion_protection": true
           }
         },
         {
@@ -291,6 +292,30 @@
           "values": {
             "target_prefix": "self/"
           }
+        },
+        {
+          "address": "aws_s3_bucket_lifecycle_configuration.site",
+          "mode": "managed",
+          "type": "aws_s3_bucket_lifecycle_configuration",
+          "name": "site",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "bucket": "acme-site",
+            "rule": [{"id": "expire-noncurrent", "status": "Enabled"}]
+          }
+        },
+        {
+          "address": "aws_s3_bucket_lifecycle_configuration.logs",
+          "mode": "managed",
+          "type": "aws_s3_bucket_lifecycle_configuration",
+          "name": "logs",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "bucket": "acme-logs",
+            "rule": [{"id": "expire-noncurrent", "status": "Enabled"}]
+          }
         }
       ],
       "child_modules": [
@@ -446,6 +471,34 @@
             },
             "target_prefix": {
               "constant_value": "self/"
+            }
+          }
+        },
+        {
+          "address": "aws_s3_bucket_lifecycle_configuration.site",
+          "mode": "managed",
+          "type": "aws_s3_bucket_lifecycle_configuration",
+          "name": "site",
+          "expressions": {
+            "bucket": {
+              "references": [
+                "aws_s3_bucket.site.id",
+                "aws_s3_bucket.site"
+              ]
+            }
+          }
+        },
+        {
+          "address": "aws_s3_bucket_lifecycle_configuration.logs",
+          "mode": "managed",
+          "type": "aws_s3_bucket_lifecycle_configuration",
+          "name": "logs",
+          "expressions": {
+            "bucket": {
+              "references": [
+                "aws_s3_bucket.logs.id",
+                "aws_s3_bucket.logs"
+              ]
             }
           }
         }

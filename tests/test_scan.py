@@ -12,7 +12,7 @@ TODAY = date(2026, 10, 10)
 
 def plan():
     return make_plan(
-        ("aws_db_instance", "db", {"publicly_accessible": True, "storage_encrypted": True, "backup_retention_period": 0}),
+        ("aws_db_instance", "db", {"publicly_accessible": True, "storage_encrypted": True, "backup_retention_period": 0, "deletion_protection": True}),
         ("aws_ebs_volume", "v", {"encrypted": False}),
     )
 
