@@ -372,3 +372,30 @@ def rds_deletion_protection(plan: Plan) -> Iterator[Hit]:
             yield res, "deletion_protection is not set to true"
 
 
+@rule(
+    "PG019",
+    "ECS task definition has containers without log configuration",
+    "medium",
+    "aws",
+    ["AU-2", "AU-12"],
+    risk="Container stdout/stderr is silently discarded, leaving no audit trail for incident investigation.",
+    fix="Add a logConfiguration block (e.g. awslogs driver) to every container_definitions entry.",
+)
+def ecs_task_log_config(plan: Plan) -> Iterator[Hit]:
+    import json
+
+    for task in plan.of_type("aws_ecs_task_definition"):
+        raw = task.get("container_definitions")
+        if not raw:
+            continue
+        try:
+            containers = json.loads(raw) if isinstance(raw, str) else raw
+        except (ValueError, TypeError):
+            continue
+        if not isinstance(containers, list):
+            continue
+        missing = [c.get("name", "<unnamed>") for c in containers if not c.get("logConfiguration")]
+        if missing:
+            yield task, f"container(s) have no logConfiguration: {', '.join(missing)}"
+
+
