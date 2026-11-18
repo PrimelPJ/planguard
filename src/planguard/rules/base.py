@@ -49,7 +49,7 @@ def rule(id: str, title: str, severity: str, cloud: str, controls: list[str], ri
 # ---- small helpers shared by the AWS and Azure rules ----
 
 INTERNET = {"0.0.0.0/0", "::/0", "*", "internet", "any"}
-ADMIN_PORTS = {22: "SSH", 3389: "RDP"}
+ADMIN_PORTS = {22: "SSH", 3389: "RDP", 5985: "WinRM", 5986: "WinRM-HTTPS", 1521: "Oracle-DB"}
 
 
 def is_internet(source: object) -> bool:
