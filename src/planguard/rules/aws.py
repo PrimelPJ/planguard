@@ -373,6 +373,21 @@ def rds_deletion_protection(plan: Plan) -> Iterator[Hit]:
 
 
 @rule(
+    "PG020",
+    "SQS queue does not use KMS encryption",
+    "medium",
+    "aws",
+    ["SC-28"],
+    risk="Messages at rest are not encrypted with a customer-managed key, reducing control over data confidentiality.",
+    fix="Set kms_master_key_id to a KMS key ARN or alias on the aws_sqs_queue resource.",
+)
+def sqs_kms_encryption(plan: Plan) -> Iterator[Hit]:
+    for queue in plan.of_type("aws_sqs_queue"):
+        if not queue.get("kms_master_key_id"):
+            yield queue, "kms_master_key_id is not set"
+
+
+@rule(
     "PG019",
     "ECS task definition has containers without log configuration",
     "medium",
