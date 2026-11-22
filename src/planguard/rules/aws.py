@@ -388,6 +388,23 @@ def sqs_kms_encryption(plan: Plan) -> Iterator[Hit]:
 
 
 @rule(
+    "PG021",
+    "RDS instance or cluster has insufficient backup retention period",
+    "medium",
+    "aws",
+    ["CP-9"],
+    risk="A short or zero backup retention window limits recovery options after accidental deletion or data corruption.",
+    fix="Set backup_retention_period to at least 7 on the aws_db_instance or aws_rds_cluster resource.",
+)
+def rds_backup_retention(plan: Plan) -> Iterator[Hit]:
+    for res in plan.of_type("aws_db_instance", "aws_rds_cluster"):
+        retention = res.get("backup_retention_period")
+        if retention is None or int(retention) < 7:
+            period_str = str(retention) if retention is not None else "unset"
+            yield res, f"backup_retention_period is {period_str}, recommended minimum is 7 days"
+
+
+@rule(
     "PG019",
     "ECS task definition has containers without log configuration",
     "medium",
