@@ -432,7 +432,7 @@ def ecs_task_log_config(plan: Plan) -> Iterator[Hit]:
 
 
 @rule(
-    "PG020",
+    "PG022",
     "S3 bucket does not have server access logging enabled",
     "medium",
     "aws",
