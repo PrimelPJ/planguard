@@ -431,3 +431,21 @@ def ecs_task_log_config(plan: Plan) -> Iterator[Hit]:
             yield task, f"container(s) have no logConfiguration: {', '.join(missing)}"
 
 
+@rule(
+    "PG020",
+    "S3 bucket does not have server access logging enabled",
+    "medium",
+    "aws",
+    ["AU-2", "AU-12"],
+    risk="Without access logging, there is no record of who read or modified objects, making incident investigation and compliance auditing impossible.",
+    fix="Add an aws_s3_bucket_logging resource that targets this bucket to enable server access logging.",
+)
+def s3_access_logging(plan: Plan) -> Iterator[Hit]:
+    logging_configs = plan.of_type("aws_s3_bucket_logging")
+    for bucket in plan.of_type("aws_s3_bucket"):
+        if bucket.block("logging").get("target_bucket"):
+            continue  # inline logging block present
+        if not any(lc.points_to("bucket", bucket) for lc in logging_configs):
+            yield bucket, "server access logging is not configured for this bucket"
+
+
